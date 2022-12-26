@@ -26,7 +26,7 @@ class Controller {
     private readonly modellingTimePaceCoef: number
   ) {
     this.startRushHour();
-    this.runScrapper("facebook");
+    this.runScrapper("facebook", 10, 20);
     this.runQueueingSystem(10);
   }
 
@@ -59,16 +59,21 @@ class Controller {
     );
   }
 
-  async runScrapper(platform: Platform) {
+  async runScrapper(
+    platform: Platform,
+    minInterval: number,
+    maxInterval: number
+  ) {
     const post = this.randomPost(platform);
     this.queue.enqueue(post);
-    const min = 10;
-    const max = 100;
-    const rand = getRandomArbitrary(min, max);
+    const rand = getRandomArbitrary(minInterval, maxInterval);
     const interval =
       (this.isRushHour ? rand / 10 : rand) * this.modellingTimePaceCoef;
 
-    setTimeout(() => this.runScrapper(platform), interval);
+    setTimeout(
+      () => this.runScrapper(platform, minInterval, maxInterval),
+      interval
+    );
   }
 
   async runQueueingSystem(delay: number) {
