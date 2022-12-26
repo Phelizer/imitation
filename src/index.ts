@@ -21,13 +21,12 @@ class Post {
 }
 
 class Controller {
-  constructor(private readonly queue: Queue<Post>) {
+  constructor(
+    private readonly queue: Queue<Post>,
+    private readonly modellingTimePaceCoef: number
+  ) {
     this.startRushHour();
-    setInterval(() => {
-      console.log(this.isRushHour);
-    }, 100);
-
-    this.runThreeScrappers();
+    this.runScrapper("facebook");
     this.runQueueingSystem(10);
   }
 
@@ -63,22 +62,21 @@ class Controller {
   async runScrapper(platform: Platform) {
     const post = this.randomPost(platform);
     this.queue.enqueue(post);
-    const interval = this.isRushHour
-      ? Math.floor(getRandomArbitrary(10, 100) / 10)
-      : getRandomArbitrary(10, 100);
+    const min = 10;
+    const max = 100;
+    const rand = getRandomArbitrary(min, max);
+    const interval =
+      (this.isRushHour ? rand / 10 : rand) * this.modellingTimePaceCoef;
 
     setTimeout(() => this.runScrapper(platform), interval);
   }
 
-  runThreeScrappers() {
-    this.runScrapper("facebook");
-    this.runScrapper("telegram");
-    this.runScrapper("twitter");
-  }
-
   async runQueueingSystem(delay: number) {
     const post = this.queue.dequeue();
-    setTimeout(() => this.runQueueingSystem(delay), post ? delay : 1);
+    setTimeout(
+      () => this.runQueueingSystem(delay),
+      (post ? delay : 1) * this.modellingTimePaceCoef
+    );
   }
 }
 
@@ -87,10 +85,4 @@ setInterval(() => {
   console.log("Queue size: ", queue.length);
 }, 500);
 
-const controller = new Controller(queue);
-
-// runScrapper("facebook", queue);
-// runScrapper("telegram", queue);
-// runScrapper("twitter", queue);
-
-// setTimeout(() => runQueueingSystem(queue, 800), 5000);
+const controller = new Controller(queue, 1);
