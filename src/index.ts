@@ -3,10 +3,7 @@ import { Queue } from "./queue.js";
 
 type Platform = "twitter" | "facebook" | "telegram";
 
-// TODO: refactor
-function getRandomArbitrary(min: number, max: number) {
-  return Math.random() * (max - min) + min;
-}
+const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
 class Post {
   constructor(
@@ -31,7 +28,7 @@ class Controller {
   }
 
   startRushHour() {
-    const interval = getRandomArbitrary(2000, 4000);
+    const interval = random(2000, 4000);
     setTimeout(() => {
       this.isRushHour = true;
       this.stopRushHour();
@@ -39,7 +36,7 @@ class Controller {
   }
 
   stopRushHour() {
-    const duration = getRandomArbitrary(400, 800);
+    const duration = random(400, 800);
     setTimeout(() => {
       this.isRushHour = false;
       this.startRushHour();
@@ -54,8 +51,8 @@ class Controller {
       platform,
       Date.now(),
       "text",
-      Math.floor(getRandomArbitrary(0, 10000)),
-      Math.floor(getRandomArbitrary(0, 1000))
+      Math.floor(random(0, 10000)),
+      Math.floor(random(0, 1000))
     );
   }
 
@@ -66,7 +63,7 @@ class Controller {
   ) {
     const post = this.randomPost(platform);
     this.queue.enqueue(post);
-    const rand = getRandomArbitrary(minInterval, maxInterval);
+    const rand = random(minInterval, maxInterval);
     const interval =
       (this.isRushHour ? rand / 10 : rand) * this.modellingTimePaceCoef;
 
